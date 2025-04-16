@@ -20,6 +20,7 @@ fun Application.configureSerialization(repository: TaskRepository) {
         route("/tasks") {
             get {
                 val tasks = repository.allTasks()
+
                 call.respond(tasks)
             }
 

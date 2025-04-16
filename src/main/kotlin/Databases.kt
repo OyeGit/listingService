@@ -116,12 +116,12 @@ fun Application.configureDatabases() {
  * your application shuts down by calling [Connection.close]
  * */
 fun Application.connectToPostgres(embedded: Boolean): Connection {
-    Class.forName("com.mysql.jdbc.Driver")
+    Class.forName("com.mysql.cj.jdbc.Driver")
     if (embedded) {
         log.info("Using embedded H2 database for testing; replace this flag to use postgres")
         return DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "root", "")
     } else {
-        val url = "jdbc:mysql://localhost:3306/ktor_task_db"
+        val url = "jdbc:mysql://localhost:3306/default"
         log.info("Connecting to postgres database at $url")
         val user = "root"
         val password = "Pr0duct10n!"
