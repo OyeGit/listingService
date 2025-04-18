@@ -5,7 +5,7 @@ ktor:
     deployment:
         port: 8080
 
-mysql:
-  url: "jdbc:mysql://localhost:3306/ktor_task_db"
-  user: "root"
-  password: "Pr0duct10n!"
+postgres:
+  url: "jdbc:postgresql://localhost/ListingApp"
+  user: "Postgres"
+  password: "Pr0duction!"

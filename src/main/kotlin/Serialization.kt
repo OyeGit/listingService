@@ -39,7 +39,9 @@ fun Application.configureSerialization(repository: TaskRepository) {
             }
 
             get("/byPriority/{priority}") {
+
                 val priorityAsText = call.parameters["priority"]
+                log.info("configureSerialization - Executing /byPriority/{priority}")
                 if (priorityAsText == null) {
                     call.respond(HttpStatusCode.BadRequest)
                     return@get
@@ -81,6 +83,92 @@ fun Application.configureSerialization(repository: TaskRepository) {
                     call.respond(HttpStatusCode.NoContent)
                 } else {
                     call.respond(HttpStatusCode.NotFound)
+                }
+            }
+        }
+        route("/tasks") {
+            get {
+                val tasks = repository.allTasks()
+
+                call.respond(tasks)
+            }
+
+            get("/byName/{taskName}") {
+                val name = call.parameters["taskName"]
+                if (name == null) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+                val task = repository.taskByName(name)
+                if (task == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                call.respond(task)
+            }
+        }
+        route("/properties") {
+            get {
+                val properties = repository.allProperties()
+
+                call.respond(properties)
+            }
+
+            get("/byState/{stateid}") {
+                val stateid = call.parameters["stateid"]
+                if (stateid == null) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+                val properties = repository.propertyByState(stateid.toInt())
+                if (properties == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                call.respond(properties)
+            }
+
+            get("/byIdProp/{idProp}") {
+                val idProp = call.parameters["idProp"]
+                log.info("configureSerialization - Executing /byIdProp/{idProp}")
+                log.info("configureSerialization - ipProp = $idProp")
+                if (idProp == null) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+                val property = repository.propertyByIdProp(idProp.toInt())
+                if (property == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                call.respond(property)
+            }
+
+            get("/bylga/{lgaId}") {
+                log.info("configureSerialization - Executing /bylga/{lgaId}")
+                val lgaId = call.parameters["lgaId"]
+                log.info("configureSerialization - lgaid = $lgaId")
+                if (lgaId == null) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+                val properties = repository.propertyByLga(lgaId.toInt())
+                if (properties == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                call.respond(properties)
+            }
+
+            post {
+                try {
+                    val task = call.receive<Task>()
+                    repository.addTask(task)
+                    call.respond(HttpStatusCode.NoContent)
+                } catch (ex: IllegalStateException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                } catch (ex: JsonConvertException) {
+                    call.respond(HttpStatusCode.BadRequest)
                 }
             }
         }
